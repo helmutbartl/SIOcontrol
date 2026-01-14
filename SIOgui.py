@@ -7,7 +7,7 @@ def startprocess():
     print("starting process")
     spraytime = str(float(stime.value)/1000)
     plungedelay = str(float(pdelay.value)/1000)
-    arguments = ["python3","SIOapplyandplunge.py","--stime",spraytime,"--pdelay",plungedelay]
+    arguments = ["python","SIOapplyandplunge.py","--stime",spraytime,"--pdelay",plungedelay]
     if donotplunge.value==1:
         arguments.append("--donotplunge")
     call(arguments)
@@ -15,13 +15,13 @@ def startprocess():
     
 def powerup():
     print("Power up")
-    arguments = ["python3","SIOpowerupdown.py","--updown","up"]
+    arguments = ["python","SIOpowerupdown.py","--updown","up"]
     call(arguments)
     button_start.enable()
     
 def powerdown():
     print("Power down")
-    arguments = ["python3","SIOpowerupdown.py","--updown","down"]
+    arguments = ["python","SIOpowerupdown.py","--updown","down"]
     call(arguments)
     button_start.disable()
     
@@ -29,11 +29,8 @@ def cleanprocess():
     print("starting clean process")
     spraytime  = str(float(cleantime.value)/1000)
     cycles = cleancycles.value
-    arguments = ["python3","SIOclean.py","--stime",spraytime,"--cycles",cycles]
-    #print(arguments)
-    #call(arguments)
+    arguments = ["python","SIOclean.py","--stime",spraytime,"--cycles",cycles]
     Popen(arguments)
-    #call(["python3","cleancontrol.py","--stime",stime,"--cycles",cycles])
 
 app = App(title="Shake-it-off", layout="grid")
 stimelabel  = Text(app, text="Spray time (ms)", grid=[0,1])
