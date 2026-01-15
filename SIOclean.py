@@ -15,10 +15,13 @@ if __name__=='__main__':
     parser.add_argument('--cycles', help='number of cleaning pulses',default = 5, type=int,required=False)
     args = parser.parse_args()
 
+    print(f"[SIOclean] Starting cleaning: {args.cycles} cycles, {args.stime}s pulse")
+    
     for x in range(args.cycles):
         GPIO.output(pin.cannon,GPIO.HIGH)
         time.sleep(args.stime)
         GPIO.output(pin.cannon,GPIO.LOW)
         time.sleep(0.2)
     
-GPIO.cleanup()
+    print("[SIOclean] Cleaning completed")
+    GPIO.cleanup()
