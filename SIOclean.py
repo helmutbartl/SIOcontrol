@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import Mock.GPIO as GPIO
 #import RPi.GPIO as GPIO
+import Mock.GPIO as GPIO
 import time, argparse
 import SIOpinlist as pin
 
