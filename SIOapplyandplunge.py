@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 # Uncomment for use of pi
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
+import Mock.GPIO as GPIO
 #import Adafruit_DHT
 import time, threading
 import argparse
@@ -49,9 +50,9 @@ def releaseplunger(plunger,wait):
 def resetplunger(plunger):
     GPIO.output(plunger,GPIO.LOW)
     
-def readenvironment(dht22):
-    humidity, temperature = Adafruit_DHT.read_retry(22, pin=dht22)
-    return humidity, temperature
+#def readenvironment(dht22):
+#    humidity, temperature = Adafruit_DHT.read_retry(22, pin=dht22)
+#    return humidity, temperature
     
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description='Arguments for SIOcontrol')
