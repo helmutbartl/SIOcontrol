@@ -16,8 +16,8 @@ from subprocess import call, Popen
 from datetime import datetime
 from threading import Thread
 
-# Set window size for 1280x720 touchscreen
-Window.size = (1280, 720)
+# Set window size for 1280x720 display minus taskbar and title bar
+Window.size = (1280, 640)
 
 # Color palette
 COLORS = {
@@ -37,15 +37,15 @@ class NumericInputRow(BoxLayout):
         super().__init__(**kwargs)
         self.orientation = 'horizontal'
         self.size_hint_y = None
-        self.height = 70
-        self.spacing = 10
+        self.height = 46
+        self.spacing = 6
         self.step = step
         
         # Label
         label = Label(
             text=label_text,
             color=COLORS["text"],
-            font_size='18sp',
+            font_size='20sp',
             size_hint_x=0.4,
             halign='left',
             valign='middle'
@@ -55,7 +55,7 @@ class NumericInputRow(BoxLayout):
         # Minus button
         self.minus_btn = Button(
             text='-',
-            font_size='28sp',
+            font_size='30sp',
             size_hint_x=0.15,
             background_color=COLORS["muted"],
             background_normal=''
@@ -66,7 +66,7 @@ class NumericInputRow(BoxLayout):
         self.text_input = TextInput(
             text=default_value,
             multiline=False,
-            font_size='22sp',
+            font_size='18sp',
             size_hint_x=0.3,
             background_color=COLORS["panel"],
             foreground_color=COLORS["text"],
@@ -78,7 +78,7 @@ class NumericInputRow(BoxLayout):
         # Plus button
         self.plus_btn = Button(
             text='+',
-            font_size='28sp',
+            font_size='30sp',
             size_hint_x=0.15,
             background_color=COLORS["muted"],
             background_normal=''
@@ -114,8 +114,8 @@ class ControlPanel(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.orientation = 'vertical'
-        self.padding = 25
-        self.spacing = 15
+        self.padding = 10
+        self.spacing = 8
         self.terminal = None  # Will be set by main app
         
         # Add background color
@@ -128,9 +128,9 @@ class ControlPanel(BoxLayout):
         title = Label(
             text='Run Cycle',
             color=COLORS["text"],
-            font_size='28sp',
+            font_size='22sp',
             size_hint_y=None,
-            height=45,
+            height=26,
             bold=True
         )
         
@@ -138,9 +138,9 @@ class ControlPanel(BoxLayout):
         subtitle = Label(
             text='Adjust timings, power up, then start.',
             color=COLORS["muted"],
-            font_size='16sp',
+            font_size='13sp',
             size_hint_y=None,
-            height=30
+            height=15
         )
         
         # Spray time input
@@ -149,40 +149,31 @@ class ControlPanel(BoxLayout):
         # Plunge delay input
         self.plunge_delay = NumericInputRow('Plunge delay (ms)', default_value='5', step=1)
         
-        # Checkbox for "do not plunge"
-        checkbox_layout = BoxLayout(
+        # Buttons block (two rows) with checkbox column
+        buttons_block = BoxLayout(
             orientation='horizontal',
             size_hint_y=None,
-            height=50,
+            height=110,
             spacing=10
         )
-        self.donotplunge_check = CheckBox(
-            size_hint_x=0.1,
-            color=COLORS["accent"]
+
+        buttons_column = BoxLayout(
+            orientation='vertical',
+            size_hint_x=0.75,
+            spacing=6
         )
-        checkbox_label = Label(
-            text='Do not plunge',
-            color=COLORS["text"],
-            font_size='18sp',
-            size_hint_x=0.9,
-            halign='left',
-            valign='middle'
-        )
-        checkbox_label.bind(size=checkbox_label.setter('text_size'))
-        checkbox_layout.add_widget(self.donotplunge_check)
-        checkbox_layout.add_widget(checkbox_label)
-        
-        # Buttons row
+
         buttons_row = BoxLayout(
             orientation='horizontal',
             size_hint_y=None,
-            height=80,
-            spacing=15
+            height=52,
+            spacing=8
         )
         
         self.powerup_btn = Button(
             text='Ready',
-            font_size='22sp',
+            font_size='18sp',
+            size_hint_x=0.22,
             background_color=COLORS["accent"],
             background_normal=''
         )
@@ -190,7 +181,8 @@ class ControlPanel(BoxLayout):
         
         self.powerdown_btn = Button(
             text='Abort',
-            font_size='22sp',
+            font_size='18sp',
+            size_hint_x=0.22,
             background_color=COLORS["warn"],
             background_normal=''
         )
@@ -198,27 +190,59 @@ class ControlPanel(BoxLayout):
         
         buttons_row.add_widget(self.powerup_btn)
         buttons_row.add_widget(self.powerdown_btn)
-        
-        # Start button
+
+        # Start button row
+        start_row = BoxLayout(
+            orientation='horizontal',
+            size_hint_y=None,
+            height=52
+        )
         self.start_btn = Button(
             text='Spray & Plunge',
-            font_size='26sp',
-            size_hint_y=None,
-            height=90,
+            font_size='22sp',
             background_color=COLORS["danger"],
             background_normal='',
             disabled=True
         )
         self.start_btn.bind(on_press=self.start_process)
+        start_row.add_widget(self.start_btn)
+
+        # Checkbox column (label below the checkbox)
+        checkbox_column = BoxLayout(
+            orientation='vertical',
+            size_hint_x=0.25,
+            spacing=4,
+            padding=[0, 4, 0, 4]
+        )
+        self.donotplunge_check = CheckBox(
+            size_hint=(None, None),
+            size=(24, 24),
+            color=COLORS["accent"]
+        )
+        checkbox_label = Label(
+            text='Do not plunge',
+            color=COLORS["text"],
+            font_size='14sp',
+            size_hint_y=None,
+            height=20,
+            halign='center',
+            valign='middle'
+        )
+        checkbox_label.bind(size=checkbox_label.setter('text_size'))
+        checkbox_column.add_widget(self.donotplunge_check)
+        checkbox_column.add_widget(checkbox_label)
+
+        buttons_column.add_widget(buttons_row)
+        buttons_column.add_widget(start_row)
+        buttons_block.add_widget(buttons_column)
+        buttons_block.add_widget(checkbox_column)
         
         # Add all widgets
         self.add_widget(title)
         self.add_widget(subtitle)
         self.add_widget(self.spray_time)
         self.add_widget(self.plunge_delay)
-        self.add_widget(checkbox_layout)
-        self.add_widget(buttons_row)
-        self.add_widget(self.start_btn)
+        self.add_widget(buttons_block)
     
     def _update_rect(self, instance, value):
         self.rect.pos = instance.pos
@@ -265,8 +289,8 @@ class CleaningPanel(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.orientation = 'vertical'
-        self.padding = 25
-        self.spacing = 15
+        self.padding = 10
+        self.spacing = 8
         self.terminal = None  # Will be set by main app
         
         # Add background color
@@ -279,9 +303,9 @@ class CleaningPanel(BoxLayout):
         title = Label(
             text='Cleaning',
             color=COLORS["text"],
-            font_size='28sp',
+            font_size='22sp',
             size_hint_y=None,
-            height=45,
+            height=26,
             bold=True
         )
         
@@ -289,9 +313,9 @@ class CleaningPanel(BoxLayout):
         subtitle = Label(
             text='Define pulse and cycles, then run.',
             color=COLORS["muted"],
-            font_size='16sp',
+            font_size='13sp',
             size_hint_y=None,
-            height=30
+            height=15
         )
         
         # Cleaning cycles input
@@ -303,9 +327,9 @@ class CleaningPanel(BoxLayout):
         # Clean button
         self.clean_btn = Button(
             text='Clean',
-            font_size='26sp',
+            font_size='22sp',
             size_hint_y=None,
-            height=90,
+            height=60,
             background_color=COLORS["accent"],
             background_normal=''
         )
@@ -349,10 +373,9 @@ class TerminalBox(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.orientation = 'vertical'
-        self.size_hint_y = None
-        self.height = 440
-        self.padding = 15
-        self.spacing = 10
+        self.size_hint_y = 0.4
+        self.padding = 6
+        self.spacing = 8
         
         # Add background color
         with self.canvas.before:
@@ -364,9 +387,9 @@ class TerminalBox(BoxLayout):
         header = Label(
             text='System Messages',
             color=COLORS["accent"],
-            font_size='18sp',
+            font_size='16sp',
             size_hint_y=None,
-            height=30,
+            height=20,
             bold=True,
             halign='left',
             valign='middle'
@@ -386,7 +409,7 @@ class TerminalBox(BoxLayout):
             text='[System ready]\n',
             readonly=True,
             font_name='RobotoMono-Regular',
-            font_size='16sp',
+            font_size='12sp',
             background_color=COLORS["bg"],
             foreground_color=COLORS["text"],
             cursor_color=(0, 0, 0, 0),  # Hide cursor
@@ -435,7 +458,7 @@ class StatusIndicator(Widget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.size_hint = (None, None)
-        self.size = (30, 30)
+        self.size = (20, 20)
         
         with self.canvas:
             self.indicator_color = Color(*COLORS["muted"])
@@ -457,9 +480,9 @@ class StatusBar(BoxLayout):
         super().__init__(**kwargs)
         self.orientation = 'horizontal'
         self.size_hint_y = None
-        self.height = 70
-        self.padding = 20
-        self.spacing = 30
+        self.height = 40
+        self.padding = 10
+        self.spacing = 20
         
         # Add background color
         with self.canvas.before:
@@ -471,7 +494,7 @@ class StatusBar(BoxLayout):
         status_label = Label(
             text='Status:',
             color=COLORS["text"],
-            font_size='20sp',
+            font_size='18sp',
             size_hint_x=0.15,
             bold=True,
             halign='left',
@@ -485,7 +508,7 @@ class StatusBar(BoxLayout):
         cryostat_label = Label(
             text='Cryostat Interlock',
             color=COLORS["text"],
-            font_size='18sp',
+            font_size='17sp',
             halign='left',
             valign='middle'
         )
@@ -499,7 +522,7 @@ class StatusBar(BoxLayout):
         plunger_label = Label(
             text='Plunger Position',
             color=COLORS["text"],
-            font_size='18sp',
+            font_size='17sp',
             halign='left',
             valign='middle'
         )
@@ -540,44 +563,44 @@ class ShakeItOffApp(App):
         
         # Main layout with proper constraints
         main_layout = BoxLayout(
-            orientation='vertical', 
-            padding=20, 
-            spacing=15
+            orientation='vertical',
+            padding=15,
+            spacing=10
         )
         
         # Header - fixed height
         header_layout = BoxLayout(
             orientation='vertical',
             size_hint_y=None,
-            height=90,
-            spacing=5
+            height=70,
+            spacing=4
         )
         
         header = Label(
             text='Shake-it-off',
             color=COLORS["accent"],
-            font_size='38sp',
+            font_size='32sp',
             size_hint_y=None,
-            height=50,
+            height=44,
             bold=True
         )
         
-        subheader = Label(
-            text='Ergonomic control for spray, plunge, and cleaning cycles',
-            color=COLORS["muted"],
-            font_size='16sp',
-            size_hint_y=None,
-            height=30
-        )
+        # subheader = Label(
+        #    text='Ergonomic control for spray, plunge, and cleaning cycles',
+        #    color=COLORS["muted"],
+        #    font_size='16sp',
+        #    size_hint_y=None,
+        #    height=30
+        #)
         
         header_layout.add_widget(header)
-        header_layout.add_widget(subheader)
+        #header_layout.add_widget(subheader)
         
         # Content layout (two panels side by side) - proportional
         content_layout = BoxLayout(
-            orientation='horizontal', 
-            spacing=20,
-            size_hint_y=0.35
+            orientation='horizontal',
+            spacing=15,
+            size_hint_y=0.8
         )
         
         # Control panel
@@ -591,10 +614,10 @@ class ShakeItOffApp(App):
         content_layout.add_widget(self.cleaning_panel)
         
         # Terminal message box - proportional
-        self.terminal = TerminalBox(size_hint_y=0.45)
+        self.terminal = TerminalBox(size_hint_y=0.2)
         
         # Status bar at bottom - fixed height
-        self.status_bar = StatusBar(size_hint_y=None, height=70)
+        self.status_bar = StatusBar(size_hint_y=None, height=55)
         
         # Add to main layout in order
         main_layout.add_widget(header_layout)

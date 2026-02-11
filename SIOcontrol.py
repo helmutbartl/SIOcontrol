@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 # Uncomment for use of pi
-#import RPi.GPIO as GPIO
-import Mock.GPIO as GPIO
+import RPi.GPIO as GPIO
+#import Mock.GPIO as GPIO
 #import Adafruit_DHT
 import time, threading
 import argparse
